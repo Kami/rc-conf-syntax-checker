@@ -20,7 +20,8 @@ import re
 import sys
 from optparse import OptionParser
 
-def check_syntax(config_file):
+def check_syntax(config_file = '/etc/rc.conf', print_report = True):
+	""" Returns True if file does not contains syntax errors, False otherwise. . """
 
 	valid_syntax = r'\w+(\s)*=(((\s)*("(\w|\s|/|\\|\-|\+|\.|\||\*|\?|,|=|:)*")|(\'(\w|\s|/|\\|\-|\+|\.|\||\*|\?|,|=|:)*\'))|\w+)(\s*#.*?)?$'
 	
@@ -65,11 +66,17 @@ def check_syntax(config_file):
 		return
 	
 	if errors:
-		errors = ['%s:%d %s' % (config_file, error[0], error[1]) for error in errors]
-		print >> sys.stderr, 'The following syntax errors were detected in your config file:'
-		print >> sys.stderr, '\n' . join(errors)
-	else:
+		if print_report:
+			errors = ['%s:%d %s' % (config_file, error[0], error[1]) for error in errors]
+			print >> sys.stderr, 'The following syntax errors were detected in your config file:'
+			print >> sys.stderr, '\n' . join(errors)
+		
+		return False
+	
+	if print_report:
 		print 'File %s contains no syntax errors.' % (config_file)
+
+	return True
 
 if __name__ == '__main__':
 	parser = OptionParser()
